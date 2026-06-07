@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickSort – Struktur Data | STMIK Banjarbaru</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --navy:   #1a1a6e;
+  --navy2:  #12125a;
+  --indigo: #2d2d9f;
+  --blue1:  #3a3ab0;
+  --blue2:  #5555cc;
+  --beige:  #d4b896;
+  --beige2: #e8d5bb;
+  --white:  #ffffff;
+  --accent: #f4a261;
+  --green:  #06d6a0;
+  --red:    #ef476f;
+  --yellow: #ffd166;
+  --purple: #a855f7;
+}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--navy2);
+  color:var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── GEOMETRIC BG DECORATIONS (mirip PPT) ── */
+.geo-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.geo-bg .circle1{
+  position:absolute;top:-80px;right:-80px;
+  width:260px;height:260px;border-radius:50%;
+  background:rgba(255,255,255,0.07);
+}
+.geo-bg .circle2{
+  position:absolute;bottom:-60px;left:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,0.05);
+}
+.geo-bg .ring1{
+  position:absolute;top:-40px;right:-40px;
+  width:200px;height:200px;border-radius:50%;
+  border:28px solid rgba(255,255,255,0.12);
+  background:transparent;
+}
+.geo-bg .ring2{
+  position:absolute;bottom:-30px;left:-30px;
+  width:160px;height:160px;border-radius:50%;
+  border:22px solid rgba(255,255,255,0.08);
+  background:transparent;
+}
+.geo-bg .diamond{
+  position:absolute;top:30%;left:-40px;
+  width:120px;height:120px;
+  background:rgba(212,184,150,0.08);
+  transform:rotate(45deg);
+}
+.geo-bg .rect1{
+  position:absolute;top:10%;right:5%;
+  width:80px;height:120px;
+  background:rgba(255,255,255,0.04);
+  border-radius:12px;
+  transform:rotate(-15deg);
+}
+.geo-bg .poly{
+  position:absolute;bottom:15%;right:-20px;
+  width:180px;height:180px;
+  background:rgba(53,53,160,0.4);
+  clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,var(--navy2) 0%,var(--indigo) 100%);
+  border-bottom:2px solid rgba(212,184,150,0.25);
+  padding:0.9rem 2rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.logo-badge{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--beige);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;color:var(--navy2);
+  flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(212,184,150,0.3);
+}
+.header-text h1{
+  font-size:1.1rem;font-weight:800;
+  color:var(--white);letter-spacing:0.02em;
+}
+.header-text p{
+  font-size:0.65rem;color:var(--beige);
+  font-weight:400;letter-spacing:0.08em;text-transform:uppercase;
+}
+.header-members{
+  margin-left:auto;
+  display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;
+}
+.member-chip{
+  background:rgba(212,184,150,0.15);
+  border:1px solid rgba(212,184,150,0.3);
+  border-radius:20px;
+  padding:0.25rem 0.7rem;
+  font-size:0.6rem;font-weight:600;
+  color:var(--beige2);letter-spacing:0.04em;
+  white-space:nowrap;
+}
+
+/* ── MAIN LAYOUT ── */
+main{position:relative;z-index:10;padding:1.5rem 2rem 3rem;}
+
+/* ── SECTION TITLE ── */
+.section-label{
+  font-size:0.6rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--beige);margin-bottom:0.5rem;
+}
+
+/* ── CARD ── */
+.card{
+  background:rgba(45,45,159,0.35);
+  border:1px solid rgba(212,184,150,0.2);
+  border-radius:16px;
+  padding:1.4rem 1.6rem;
+  backdrop-filter:blur(8px);
+}
+
+/* ── ARRAY INPUT ROW ── */
+.input-section{margin-bottom:1.5rem;}
+.input-row{display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;margin-top:0.6rem;}
+.input-row input[type=text]{
+  font-family:'Courier Prime',monospace;
+  font-size:0.85rem;padding:0.55rem 1rem;
+  border-radius:10px;border:1px solid rgba(212,184,150,0.4);
+  background:rgba(26,26,110,0.6);color:var(--white);
+  flex:1;min-width:180px;outline:none;
+  transition:border-color 0.2s;
+}
+.input-row input:focus{border-color:var(--beige);}
+
+.btn{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:0.7rem;
+  letter-spacing:0.08em;text-transform:uppercase;
+  padding:0.55rem 1.2rem;border-radius:10px;border:none;cursor:pointer;
+  transition:all 0.2s ease;white-space:nowrap;
+}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-primary{background:var(--beige);color:var(--navy2);}
+.btn-primary:hover:not(:disabled){background:var(--beige2);transform:translateY(-1px);}
+.btn-green{background:var(--green);color:#000;}
+.btn-green:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px);}
+.btn-outline{background:transparent;border:1px solid rgba(212,184,150,0.4);color:var(--beige2);}
+.btn-outline:hover:not(:disabled){border-color:var(--beige);background:rgba(212,184,150,0.1);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px);}
+
+/* ── VISUALIZER ── */
+.viz-section{margin-bottom:1.5rem;}
+#bar-container{
+  display:flex;align-items:flex-end;gap:6px;
+  height:200px;padding:0.5rem 0;
+  min-height:200px;
+}
+.bar-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  flex:1;height:100%;justify-content:flex-end;gap:5px;
+}
+.bar{
+  width:100%;border-radius:6px 6px 3px 3px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Courier Prime',monospace;font-weight:700;
+  font-size:clamp(0.55rem,1.5vw,0.8rem);
+  transition:height 0.4s cubic-bezier(.34,1.56,.64,1),
+             background 0.35s,box-shadow 0.35s,transform 0.3s;
+  cursor:default;
+}
+.bar.default {background:#3a3a9a;color:rgba(255,255,255,0.7);}
+.bar.pivot   {background:var(--beige);color:var(--navy2);box-shadow:0 0 18px rgba(212,184,150,.55);transform:scaleX(1.06);}
+.bar.left    {background:var(--green);color:#000;}
+.bar.right   {background:#4895ef;color:#fff;}
+.bar.comparing{background:var(--purple);color:#fff;box-shadow:0 0 14px rgba(168,85,247,.5);}
+.bar.sorted  {background:var(--yellow);color:#000;}
+.bar.swapping{animation:sbounce .35s ease;}
+@keyframes sbounce{0%{transform:scaleY(1.1)}50%{transform:scaleY(.92)}100%{transform:scaleY(1)}}
+.bar-idx{font-family:'Courier Prime',monospace;font-size:.6rem;color:rgba(212,184,150,.6);}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem;}
+.leg{display:flex;align-items:center;gap:.35rem;font-size:.62rem;color:rgba(255,255,255,.65);}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* ── LOG & STATS ── */
+.log-stats{display:grid;grid-template-columns:1fr auto;gap:.8rem;margin-bottom:1.5rem;}
+@media(max-width:600px){.log-stats{grid-template-columns:1fr;}}
+#step-log{
+  background:rgba(18,18,90,0.7);border:1px solid rgba(212,184,150,.2);
+  border-radius:10px;padding:.7rem 1rem;
+  font-family:'Courier Prime',monospace;font-size:.72rem;
+  color:var(--green);min-height:2.4rem;line-height:1.7;
+  word-break:break-word;
+}
+.stats-box{
+  background:rgba(45,45,159,.4);border:1px solid rgba(212,184,150,.2);
+  border-radius:10px;padding:.7rem 1rem;
+  display:flex;flex-direction:column;gap:.35rem;min-width:130px;
+}
+.stat-row{
+  font-size:.63rem;color:rgba(212,184,150,.7);
+  display:flex;justify-content:space-between;gap:.8rem;
+}
+.stat-row span{color:var(--white);font-weight:700;}
+
+/* ── CONTROLS ── */
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.4rem;align-items:center;}
+.speed-row{display:flex;align-items:center;gap:.5rem;margin-left:auto;}
+.speed-label{font-size:.62rem;color:var(--beige);font-weight:600;white-space:nowrap;}
+input[type=range]{
+  -webkit-appearance:none;width:90px;height:3px;
+  background:rgba(212,184,150,.3);border-radius:2px;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--beige);cursor:pointer;
+}
+
+/* ── STACK DISPLAY ── */
+.stack-section{margin-bottom:1.5rem;}
+#stack-display{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;min-height:1.8rem;}
+.stack-chip{
+  font-family:'Courier Prime',monospace;font-size:.65rem;
+  background:rgba(26,26,110,.7);border:1px solid rgba(168,85,247,.4);
+  border-radius:5px;padding:.2rem .5rem;color:var(--purple);
+}
+
+/* ── MATERI SINGKAT ── */
+.materi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin-bottom:1.5rem;}
+.materi-card{
+  background:rgba(45,45,159,.3);border:1px solid rgba(212,184,150,.15);
+  border-radius:12px;padding:1rem 1.2rem;
+  border-left:3px solid var(--beige);
+}
+.materi-card h3{font-size:.78rem;font-weight:700;color:var(--beige2);margin-bottom:.4rem;}
+.materi-card p{font-size:.68rem;color:rgba(255,255,255,.72);line-height:1.65;}
+
+/* ── PSEUDOCODE ── */
+.pseudo-wrap{
+  background:rgba(12,12,70,.8);border:1px solid rgba(212,184,150,.2);
+  border-radius:10px;padding:.9rem 1.1rem;margin-top:.6rem;
+  font-family:'Courier Prime',monospace;font-size:.7rem;
+  color:rgba(255,255,255,.8);line-height:1.9;
+}
+.pseudo-wrap .kw{color:var(--beige);}
+.pseudo-wrap .fn{color:var(--green);}
+.pseudo-wrap .cm{color:rgba(255,255,255,.35);font-style:italic;}
+
+/* ── COMPLEXITY TABLE ── */
+.complexity-table{width:100%;border-collapse:collapse;margin-top:.6rem;font-size:.7rem;}
+.complexity-table th,.complexity-table td{
+  padding:.5rem .8rem;border:1px solid rgba(212,184,150,.15);text-align:center;
+}
+.complexity-table th{background:rgba(212,184,150,.15);color:var(--beige2);font-weight:700;}
+.complexity-table td{color:rgba(255,255,255,.8);}
+.complexity-table tr:nth-child(even) td{background:rgba(45,45,159,.2);}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;
+  text-align:center;padding:.8rem;
+  border-top:1px solid rgba(212,184,150,.15);
+  font-size:.58rem;color:rgba(212,184,150,.5);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- BG Geometris mirip PPT -->
+<div class="geo-bg">
+  <div class="circle1"></div>
+  <div class="circle2"></div>
+  <div class="ring1"></div>
+  <div class="ring2"></div>
+  <div class="diamond"></div>
+  <div class="rect1"></div>
+  <div class="poly"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-badge">SB</div>
+  <div class="header-text">
+    <h1>Algoritma QuickSort</h1>
+    <p>Struktur Data · STMIK Banjarbaru · TI 26</p>
+  </div>
+  <div class="header-members">
+    <div class="member-chip">Aditya Gilang Ramadhan(310125023897)</div>
+    <div class="member-chip">Ahmad Anis Awafie (310125023902)</div>
+    <div class="member-chip">Muhammad Abid Firaz (310125023929)</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INPUT -->
+  <div class="input-section">
+    <div class="section-label">▸ Array Input</div>
+    <div class="card">
+      <div class="input-row">
+        <input type="text" id="arr-input" value="5,8,4,3,7,9,6,2,1" placeholder="Masukkan angka, pisahkan koma..."/>
+        <button class="btn btn-primary" onclick="applyInput()">Terapkan</button>
+        <button class="btn btn-outline" onclick="randomArr()">⚄ Acak</button>
+        <button class="btn btn-red" onclick="resetAll()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUALIZER -->
+  <div class="viz-section">
+    <div class="section-label">▸ Visualisasi Array</div>
+    <div class="card">
+
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:var(--beige)"></div>Pivot</div>
+        <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Partisi Kiri (&lt;pivot)</div>
+        <div class="leg"><div class="leg-dot" style="background:#4895ef"></div>Partisi Kanan (&gt;pivot)</div>
+        <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div>Membandingkan</div>
+        <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Sudah Terurut</div>
+      </div>
+
+      <div id="bar-container"></div>
+    </div>
+  </div>
+
+  <!-- LOG & STATS -->
+  <div class="log-stats">
+    <div id="step-log">► Tekan <b>Mulai Otomatis</b> atau <b>Langkah demi Langkah</b> untuk memulai sorting.</div>
+    <div class="stats-box">
+      <div class="stat-row">Perbandingan <span id="cmp">0</span></div>
+      <div class="stat-row">Penukaran <span id="swp">0</span></div>
+      <div class="stat-row">Langkah <span id="stp">0</span></div>
+      <div class="stat-row">Status <span id="statuslbl">Siap</span></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="btn btn-primary" id="btn-auto" onclick="startAuto()">▶ Mulai Otomatis</button>
+    <button class="btn btn-green"   id="btn-step" onclick="doStep()">⏭ Langkah demi Langkah</button>
+    <button class="btn btn-outline" id="btn-pause" onclick="togglePause()" disabled>⏸ Pause</button>
+    <div class="speed-row">
+      <span class="speed-label">🐢</span>
+      <input type="range" id="speed" min="100" max="1200" value="600" step="100" oninput="changeSpeed(this.value)">
+      <span class="speed-label">🐇</span>
+      <span class="speed-label" id="spd-lbl">600ms</span>
+    </div>
+  </div>
+
+  <!-- STACK -->
+  <div class="stack-section">
+    <div class="section-label">▸ Antrian Partisi (Stack QuickSort)</div>
+    <div class="card" style="padding:.8rem 1.2rem">
+      <div id="stack-display"><span style="font-size:.65rem;color:rgba(212,184,150,.4)">—</span></div>
+    </div>
+  </div>
+
+  <!-- MATERI -->
+  <div class="section-label">▸ Materi: Algoritma QuickSort</div>
+  <div class="materi-grid">
+    <div class="materi-card">
+      <h3>Apa itu QuickSort?</h3>
+      <p>QuickSort adalah algoritma pengurutan berbasis <b>Divide and Conquer</b> yang memilih satu elemen sebagai <b>pivot</b> lalu membagi array menjadi dua bagian: elemen lebih kecil dari pivot di kiri, dan elemen lebih besar di kanan.</p>
+    </div>
+    <div class="materi-card">
+      <h3>Konsep Dasar (Pivot)</h3>
+      <p>Pivot adalah elemen kunci pembanding. Semua elemen <b>lebih kecil dari pivot</b> dipindahkan ke kiri, dan elemen <b>lebih besar</b> ke kanan. Proses ini disebut <b>partisi</b>, lalu diulang secara rekursif.</p>
+    </div>
+    <div class="materi-card">
+      <h3>Cara Kerja</h3>
+      <p>1. Pilih pivot (elemen terakhir — Lomuto).<br>2. Partisi array: kiri &lt; pivot, kanan &gt; pivot.<br>3. Tempatkan pivot di posisi akhirnya.<br>4. Rekursi pada sub-array kiri dan kanan.</p>
+    </div>
+    <div class="materi-card">
+      <h3>Kompleksitas Waktu</h3>
+      <table class="complexity-table">
+        <tr><th>Kasus</th><th>Kompleksitas</th></tr>
+        <tr><td>Terbaik</td><td>O(n log n)</td></tr>
+        <tr><td>Rata-rata</td><td>O(n log n)</td></tr>
+        <tr><td>Terburuk</td><td>O(n²)</td></tr>
+        <tr><td>Ruang</td><td>O(log n)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- PSEUDOCODE -->
+  <div class="section-label" style="margin-top:.5rem">▸ Pseudocode QuickSort (Lomuto)</div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="pseudo-wrap">
+<span class="fn">quickSort</span>(arr, low, high):
+  <span class="kw">if</span> low &lt; high:
+    p = <span class="fn">partition</span>(arr, low, high)  <span class="cm">// tempatkan pivot</span>
+    <span class="fn">quickSort</span>(arr, low, p - 1)      <span class="cm">// rekursi kiri</span>
+    <span class="fn">quickSort</span>(arr, p + 1, high)     <span class="cm">// rekursi kanan</span>
+
+<span class="fn">partition</span>(arr, low, high):
+  pivot = arr[high]              <span class="cm">// pivot = elemen terakhir</span>
+  i = low - 1
+  <span class="kw">for</span> j = low <span class="kw">to</span> high - 1:
+    <span class="kw">if</span> arr[j] &lt;= pivot:
+      i++
+      <span class="fn">swap</span>(arr[i], arr[j])      <span class="cm">// pindahkan ke kiri</span>
+  <span class="fn">swap</span>(arr[i+1], arr[high])       <span class="cm">// tempatkan pivot</span>
+  <span class="kw">return</span> i + 1
+    </div>
+  </div>
+
+</main>
+
+<footer>TI 26 · STMIK Banjarbaru · Struktur Data · Algoritma QuickSort</footer>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let ORIG   = [5,8,4,3,7,9,6,2,1];
+let arr    = [];
+let steps  = [];
+let idx    = 0;
+let timer  = null;
+let paused = false;
+let delay  = 600;
+let cmp=0, swp=0;
+let sortedSet = new Set();
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init(data){
+  arr=[...data]; steps=[]; idx=0; cmp=0; swp=0;
+  sortedSet=new Set(); paused=false;
+  clearTimeout(timer); timer=null;
+  generateSteps([...arr]);
+  renderBars(arr,{});
+  updateStats();
+  setStack([]);
+  setLog('► Tekan <b>Mulai Otomatis</b> atau <b>Langkah demi Langkah</b> untuk memulai sorting.');
+  setStatus('Siap');
+  g('btn-auto').disabled=false;
+  g('btn-step').disabled=false;
+  g('btn-pause').disabled=true;
+  g('btn-pause').textContent='⏸ Pause';
+}
+
+// ─── STEP GENERATOR ──────────────────────────────────────────────────────────
+function generateSteps(a){
+  steps=[];
+  const w=[...a], stack=[[0,w.length-1]];
+  while(stack.length){
+    const [lo,hi]=stack.pop();
+    if(lo>=hi) continue;
+    steps.push({type:'part-start',lo,hi,arr:[...w],stack:[...stack]});
+    const pv=w[hi];
+    steps.push({type:'pivot',pi:hi,pv,lo,hi,arr:[...w],stack:[...stack]});
+    let i=lo-1;
+    for(let j=lo;j<hi;j++){
+      steps.push({type:'cmp',i,j,pi:hi,lo,hi,arr:[...w],stack:[...stack]});
+      if(w[j]<=pv){
+        i++;
+        if(i!==j){
+          [w[i],w[j]]=[w[j],w[i]];
+          steps.push({type:'swap',a:i,b:j,pi:hi,lo,hi,arr:[...w],stack:[...stack]});
+        }
+      }
+    }
+    i++;
+    [w[i],w[hi]]=[w[hi],w[i]];
+    steps.push({type:'place',pf:i,lo,hi,arr:[...w],stack:[...stack]});
+    steps.push({type:'sorted',si:i,lo,hi,arr:[...w],stack:[...stack]});
+    if(i-1>lo) stack.push([lo,i-1]);
+    if(i+1<hi) stack.push([i+1,hi]);
+  }
+  steps.push({type:'done',arr:[...w]});
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderBars(a,hl){
+  const n=a.length, mx=Math.max(...a);
+  const c=g('bar-container'); c.innerHTML='';
+  a.forEach((v,i)=>{
+    const pct=v/mx, h=Math.round(30+pct*155);
+    const wrap=document.createElement('div'); wrap.className='bar-wrap';
+    const bar=document.createElement('div');  bar.className='bar';
+    bar.style.height=h+'px';
+    if(sortedSet.has(i))          bar.classList.add('sorted');
+    else if(hl.pi===i)            bar.classList.add('pivot');
+    else if(hl.cj===i||hl.ci===i) bar.classList.add('comparing');
+    else if(hl.sa===i||hl.sb===i){bar.classList.add('swapping');bar.style.background='#f4a261';bar.style.color='#000';}
+    else if(hl.lo!==undefined&&i>=hl.lo&&i<=hl.hi) bar.classList.add('left');
+    else bar.classList.add('default');
+    bar.textContent=v;
+    const num=document.createElement('div'); num.className='bar-idx'; num.textContent=i;
+    wrap.appendChild(bar); wrap.appendChild(num); c.appendChild(wrap);
+  });
+}
+
+// ─── APPLY STEP ───────────────────────────────────────────────────────────────
+function applyStep(s){
+  idx++;
+  switch(s.type){
+    case'part-start':
+      renderBars(s.arr,{lo:s.lo,hi:s.hi});
+      setLog(`▸ Partisi baru: indeks <b>${s.lo}</b> → <b>${s.hi}</b>`);
+      setStack(s.stack); break;
+    case'pivot':
+      renderBars(s.arr,{pi:s.pi,lo:s.lo,hi:s.hi});
+      setLog(`<span style="color:var(--beige)">▸ Pivot dipilih: <b>${s.pv}</b> (indeks ${s.pi})</span>`);
+      setStack(s.stack); break;
+    case'cmp':
+      cmp++;
+      renderBars(s.arr,{cj:s.j,ci:s.i>=s.lo?s.i:-1,pi:s.pi,lo:s.lo,hi:s.hi});
+      setLog(`▸ Bandingkan arr[${s.j}]=${s.arr[s.j]} dengan pivot=${s.arr[s.pi]}`);
+      setStack(s.stack); break;
+    case'swap':
+      swp++;
+      renderBars(s.arr,{sa:s.a,sb:s.b,pi:s.pi,lo:s.lo,hi:s.hi});
+      setLog(`<span style="color:var(--yellow)">⇄ Tukar arr[${s.a}]=${s.arr[s.a]} ↔ arr[${s.b}]=${s.arr[s.b]}</span>`);
+      setStack(s.stack); break;
+    case'place':
+      renderBars(s.arr,{pi:s.pf,lo:s.l
